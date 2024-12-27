@@ -24,28 +24,42 @@ const WritePost = ({ user, setPosts }) => {
     fetchPost();
   }, [id]);
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+  
     try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+  
       if (id) {
-        await axios.put(`http://localhost:5000/api/posts/${id}`, { title, content });
-        alert('글이 수정되었습니다!');
-        window.location.reload();
+        await axios.put(`http://localhost:5000/api/posts/${id}`, { title, content }, config);
+        alert("글이 수정되었습니다!");
+        navigate(`/post/${id}`); // 수정 후 상세 페이지로 이동
       } else {
-        const response = await axios.post('http://localhost:5000/api/posts', { title, content, author: user || '익명' });
+        const response = await axios.post(
+          "http://localhost:5000/api/posts",
+          { title, content },
+          config
+        );
         setPosts((prevPosts) => [response.data, ...prevPosts]);
-        alert('글이 작성되었습니다!');
-        // 작성시간이 안나오는 부분을 0.1초 리로드하는것으로 고침
-        setTimeout(() => { 
-          window.location.reload();
-        }, 10);;
+        alert("글이 작성되었습니다!");
+        navigate("/board"); // 글 작성 후 게시판으로 이동
       }
-      navigate('/');
     } catch (error) {
-      console.error('글 저장 중 오류:', error);
-      alert('글 저장에 실패했습니다.');
+      console.error("글 저장 중 오류:", error.response?.data || error.message);
+      alert("글 저장에 실패했습니다.");
     }
   };
+  
 
   return (
     <div className="max-w-4xl mx-auto p-4">

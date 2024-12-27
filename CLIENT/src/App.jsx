@@ -13,6 +13,7 @@ import Board from "./pages/Board";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import MyProfile from "./pages/MyProfile";
+import LoginPage from "./pages/LoginPage";
 
 const App = () => {
   const getUserFromToken = () => {
@@ -27,6 +28,21 @@ const App = () => {
     }
     return null;
   };
+
+  //로그인 성공후 사용자 정보 유지
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      const userInfo = JSON.parse(atob(response.data.token.split(".")[1]));
+      setUser(userInfo); // 사용자 정보 저장
+      navigate("/");
+    } catch (error) {
+      console.error("로그인 중 오류:", error);
+      alert("로그인에 실패하였습니다.");
+    }
+  };
+  
 
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(getUserFromToken());
@@ -84,26 +100,25 @@ const App = () => {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/my-profile" element={<MyProfile user={user}/>} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} /> {/* 경로에 맞게 수정 */}
       </Routes>
 
-      {/* {user && (
-        <div className="fixed top-4 right-4 space-x-2">
+    
+        {/* <div>
           <button
             onClick={handleProfileClick}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             개인정보
           </button>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
           >
             로그아웃
           </button>
         </div>
-      )} */}
+       <Footer /> */}
 
-      {/* <Footer /> */}
+       
     </>
   );
 };

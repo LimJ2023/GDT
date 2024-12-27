@@ -1,5 +1,5 @@
 
-function Login() {
+function LoginPage() {
   return (
     <div>
         {/* 이곳에 로그인 컴포넌트를 넣어주세요 */}
@@ -8,4 +8,4 @@ function Login() {
   )
 }
 
-export default Login
+export default LoginPage

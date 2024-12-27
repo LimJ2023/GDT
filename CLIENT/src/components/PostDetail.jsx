@@ -43,22 +43,35 @@ const PostDetail = ({ posts, setPosts }) => {
   // 댓글 추가 함수
   const handleAddComment = async () => {
     if (newComment.trim() !== '') {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+  
       try {
-        const response = await axios.post(`http://localhost:5000/api/comments`, {
-          postId: id,
-          text: newComment,
-        });
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const response = await axios.post(
+          `http://localhost:5000/api/comments`,
+          {
+            post_id: id,
+            user_id: decodedToken.id, // user_id 전달
+            content: newComment, // content 사용
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setComments([...comments, response.data]);
         setNewComment('');
-        // 밑에 함수 추가로 댓글에 시간 나오게 함함
-        setTimeout(()=> {
+        setTimeout(() => {
           window.location.reload();
-        }, 10)
+        }, 10);
       } catch (error) {
         console.error('댓글 작성 중 오류 발생:', error);
       }
     }
   };
+  
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-white shadow-md rounded-md">

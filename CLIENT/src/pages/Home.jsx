@@ -2,6 +2,8 @@ import { Link } from "react-router-dom"
 import CouponCard from "../components/CouponCard";
 import { useState, useEffect } from "react";
 import AddCoupon from "../components/coupon/AddCoupon";
+import axios from "axios";
+
 function Home() {
   const [coupons, setCoupons] = useState([
         {
