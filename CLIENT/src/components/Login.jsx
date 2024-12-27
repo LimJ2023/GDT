@@ -26,31 +26,38 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">로그인</h2>
-      {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
-      <form onSubmit={handleLogin} className="space-y-4">
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full border p-2 rounded"
-        />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          로그인
-        </button>
-      </form>
-    </div>
+<div className="max-w-md mx-auto p-4">
+  <h2 className="text-2xl font-bold mb-4">로그인</h2>
+  {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
+  <form onSubmit={handleLogin} className="space-y-4">
+    <input
+      type="email"
+      placeholder="이메일"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      required
+      className="w-full border p-2 rounded"
+    />
+    <input
+      type="password"
+      placeholder="비밀번호"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+      className="w-full border p-2 rounded"
+    />
+    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+      로그인
+    </button>
+  </form>
+  <p className="text-center mt-4">아이디가 없으신가요?</p>
+  <button
+    onClick={() => navigate('/signup')}
+    className="text-blue-500 underline mt-2"
+  >
+    회원가입 하기
+  </button>
+</div>
   );
 };
 

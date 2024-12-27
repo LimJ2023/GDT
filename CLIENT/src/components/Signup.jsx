@@ -15,8 +15,8 @@ const Signup = () => {
         email,
         password,
       });
-      alert('회원가입이 완료되었습니다!');
-      navigate('/login');
+      alert('회원가입이 완료되었습니다! 이메일 인증을 진행해주세요.');
+      navigate('/email-verification', { state: { email } }); // 이메일 인증 페이지로 이동
     } catch (error) {
       console.error('회원가입 오류:', error.response?.data || error.message);
       setErrorMessage(
@@ -24,6 +24,7 @@ const Signup = () => {
       );
     }
   };
+  
 
   const handleNaverSignup = () => {
     // 네이버 OAuth 로그인 URL로 이동

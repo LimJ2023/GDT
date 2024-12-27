@@ -5,22 +5,30 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
+  
+  
   useEffect(() => {
     const verifyEmail = async () => {
       const token = searchParams.get('token');
+      if (!token) {
+        alert('유효하지 않은 접근입니다.');
+        navigate('/');
+        return;
+      }
+  
       try {
         await axios.get(`http://localhost:5000/api/verify-email?token=${token}`);
         alert('이메일 인증이 완료되었습니다!');
         navigate('/login');
       } catch (error) {
-        console.error('이메일 인증 중 오류:', error);
+        console.error('이메일 인증 실패:', error);
         alert('이메일 인증에 실패하였습니다.');
       }
     };
-
+  
     verifyEmail();
   }, [navigate, searchParams]);
+  
 
   return (
 	<div className="text-center">

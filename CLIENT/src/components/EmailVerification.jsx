@@ -1,34 +1,48 @@
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
-const EmailVerification = ({ email }) => {
+const EmailVerification = () => {
   const [code, setCode] = useState('');
   const [isCodeSent, setIsCodeSent] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const email = location.state?.email; // 이메일 전달받기
 
   // 인증 코드 요청
   const handleSendCode = async () => {
+    if (!email) {
+      alert('이메일 정보가 없습니다. 다시 시도해주세요.');
+      return;
+    }
+
     try {
       await axios.post('http://localhost:5000/api/send-verification-code', { email });
       setIsCodeSent(true);
       alert('인증 코드가 이메일로 전송되었습니다.');
     } catch (error) {
+      console.error('인증 코드 전송 실패:', error.response?.data || error.message);
       alert('인증 코드 전송에 실패했습니다.');
     }
   };
 
   // 인증 코드 확인
   const handleVerifyCode = async () => {
-	try {
-	  await axios.post('http://localhost:5000/api/verify-code', { email, code });
-	  alert('이메일 인증이 완료되었습니다.');
-	  navigate('/signup', { state: { email } }); // 인증된 이메일과 함께 이동
-	} catch (error) {
-	  alert('인증 코드가 올바르지 않습니다.');
-	}
+    if (!code.trim()) {
+      alert('인증 코드를 입력해주세요.');
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5000/api/verify-code', { email, code });
+      alert('이메일 인증이 완료되었습니다.');
+      navigate('/signup', { state: { email } });
+    } catch (error) {
+      console.error('인증 코드 확인 실패:', error.response?.data || error.message);
+      alert('인증 코드가 올바르지 않습니다.');
+    }
   };
-  
 
   return (
     <div className="max-w-md mx-auto p-4">
