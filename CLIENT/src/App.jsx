@@ -50,6 +50,8 @@ const App = () => {
     fetchPosts();
   }, []);
 
+
+  
   // 개인정보 페이지로 이동하는 함수
   const handleProfileClick = () => {
     navigate("/my-profile");

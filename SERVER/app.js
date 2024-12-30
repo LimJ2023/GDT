@@ -16,6 +16,29 @@ const crypto = require("crypto");
 app.use(cors());
 app.use(express.json());
 
+
+//db 테스트 부분
+// app.get("/db-test", (req, res) => {
+//   db.query("SELECT 1 + 1 AS solution", (err, results) => {
+//     if (err) {
+//       return res.status(500).send("DB 연결 실패: " + err.message);
+//     }
+//     res.send(`DB 연결 성공, 테스트 결과: ${results[0].solution}`);
+//   });
+// });
+
+app.get("/db-debug", (req, res) => {
+  db.query("SELECT DATABASE() AS db", (err, result) => {
+    if (err) {
+      console.error("디버깅 중 DB 오류:", err);
+      return res.status(500).send("DB 연결에 실패했습니다");
+    }
+    res.send(`현재 연결된 데이터베이스: ${result[0].db}`);
+  });
+});
+
+
+
 // Nodemailer 설정
 const transporter = nodemailer.createTransport({
   host: "smtp.naver.com", // 네이버 SMTP 서버
