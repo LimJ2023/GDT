@@ -16,6 +16,9 @@ const crypto = require("crypto");
 app.use(cors());
 app.use(express.json());
 
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+
+
 // 머지 병합용 한줄 추가
 // 머지 병합 테스트 용 한줄 더 추가
 
@@ -96,18 +99,21 @@ app.post("/api/posts", (req, res) => {
   });
 });
 
+
 // 글 목록 조회 API (GET 요청 핸들러)
 app.get("/api/posts", (req, res) => {
   const query =
-    'SELECT id, title, content, author, DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") as created_at FROM posts ORDER BY created_at DESC';
+    'SELECT id, title, content, author, DATE_FORMAT(posted_at, "%Y-%m-%d %H:%i:%s") as posted_at FROM posts ORDER BY posted_at DESC';
 
   db.query(query, (err, results) => {
     if (err) {
-      return res.status(500).send(err);
+      console.error("글 목록 조회 중 오류 발생:", err);
+      return res.status(500).send({ message: "글 목록 조회 중 오류 발생", error: err });
     }
     res.send(results);
   });
 });
+
 
 // 글 상세 조회 API
 app.get("/api/posts/:id", (req, res) => {

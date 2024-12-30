@@ -10,6 +10,7 @@ const WritePost = ({ user, setPosts }) => {
 
   useEffect(() => {
     const fetchPost = async () => {
+      
       if (id) {
         try {
           const response = await axios.get(`http://localhost:5000/api/posts/${id}`);
