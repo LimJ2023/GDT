@@ -16,6 +16,7 @@ const crypto = require("crypto");
 app.use(cors());
 app.use(express.json());
 
+// 머지 병합용 한줄 추가
 
 //db 테스트 부분
 // app.get("/db-test", (req, res) => {
