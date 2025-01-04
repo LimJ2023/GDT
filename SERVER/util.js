@@ -1,5 +1,6 @@
 const tesseract = require('tesseract.js');
 const sharp = require('sharp');
+
 const {
     MultiFormatReader,
     DecodeHintType,
@@ -56,7 +57,6 @@ async function extractBarcodeAndText(imageBuffer) {
                 storeName: storeName,
                 orderNumber: orderNumber
             };
-            console.log("쿠폰 정보",couponInfo);
             return couponInfo;
         } else if(couponType === 'gifticon') {
         }
@@ -83,14 +83,14 @@ const extractProductName = (text) => {
     let maxLength = 0;
     
     for (const line of lines) {
-        const trimmedLine = line.trim();
+        const trimmedLine = removeAllSpaces(line);
         // 한글이 포함된 라인 중에서 가장 긴 것을 상품명으로 간주
         if (trimmedLine.match(/[가-힣]/) && trimmedLine.length > maxLength) {
             // "교환처", "유효기간" 등의 키워드가 포함되지 않은 라인만 선택
-            if (!trimmedLine.includes('교 환 처') && 
-            !trimmedLine.includes('유 효 기간') && 
-            !trimmedLine.includes('선 물 하기') && 
-            !trimmedLine.includes('주 문 번호')) {
+            if (!trimmedLine.includes('교환처') && 
+            !trimmedLine.includes('유효기간') &&
+            !trimmedLine.includes('선물하기') && 
+            !trimmedLine.includes('주문번호')) {
                 productName = trimmedLine;
                 maxLength = trimmedLine.length;
             }
@@ -99,27 +99,45 @@ const extractProductName = (text) => {
     return productName;
 };
 
-// 유효기간 추출 함수
+// OCR 결과 텍스트에서 모든 공백을 제거하는 함수 추가
+const removeAllSpaces = (text) => {
+    return text.replace(/\s+/g, '');
+};
+
+// 유효기간 추출 함수 수정
 const extractExpiryDate = (text) => {
-    const expiryMatch = text.match(/유 효\s*기간\s*(20\d{2})\s*년\s*(\d{2})\s*월\s*(\d{2})\s*일/);
-    if (expiryMatch) {
-        return `${expiryMatch[1]}-${expiryMatch[2]}-${expiryMatch[3]}`;
+    const noSpaceText = removeAllSpaces(text);
+    if (noSpaceText.includes("년")) {
+        const expiryMatch = noSpaceText.match(/유효기간(20\d{2})년(\d{2})월(\d{2})일/);
+        if (expiryMatch) {
+            return `${expiryMatch[1]}-${expiryMatch[2]}-${expiryMatch[3]}`;
+        }
+    } else {
+        const expiryMatch = noSpaceText.match(/유효기간(20\d{2})\.(\d{2})\.(\d{2})/);
+        if (expiryMatch) {
+            return `${expiryMatch[1]}-${expiryMatch[2]}-${expiryMatch[3]}`;
+        }
     }
     return null;
 };
 
-// 교환처(매장명) 추출 함수
+// 교환처(매장명) 추출 함수 수정
 const extractStoreName = (text) => {
-    const storeMatch = text.match(/교 환 처\s*([가-힣]+)/);
-    return storeMatch ? storeMatch[1] : null;
+    const noSpaceText = removeAllSpaces(text);
+    const storeMatch = noSpaceText.match(/교환처([^유효기간 가-]+)/);
+    if (storeMatch) {
+        return storeMatch[1];
+    }
+    return null;
 };
 
-// 주문번호 추출 함수
+// 주문번호 추출 함수 수정
 const extractOrderNumber = (text) => {
-    const orderMatch = text.match(/주 문 번호\s*(\d+)/);
+    const noSpaceText = removeAllSpaces(text);
+    const orderMatch = noSpaceText.match(/주문번호(\d+)/);
     return orderMatch ? orderMatch[1] : null;
 };
 
 
 
-module.exports = { extractBarcodeAndText };
+module.exports = {extractBarcodeAndText};
