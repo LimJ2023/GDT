@@ -151,6 +151,7 @@ function Home({ coupons, setCoupons }) {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="main body flex-grow">
+
         <div className="hidden md:flex justify-center bg-white">
           <div className="이미지업로더창 w-full mx-[20%] mt-40 mb-52 min-w-[400px]">
             <ImageUploader onImageUpload={handleImageUpload} />
@@ -169,6 +170,7 @@ function Home({ coupons, setCoupons }) {
         </div>
         <div className="content-wrapper ">
           <div className="필터박스 sticky top-[16px] z-20 h-40 pt-2 bg-white">
+
             <div className="필터탭 flex justify-start space-x-4 sm:space-x-12 mb-6">
               {[
                 { label: "사용가능", filter: "available" },
@@ -235,6 +237,7 @@ function Home({ coupons, setCoupons }) {
         </div>
         <AddCoupon setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
         <Footer />
+
       </div>
     </div>
   );
