@@ -6,7 +6,7 @@ const CouponCard = ({ coupon }) => {
   const [isUsed, setIsUsed] = useState(false);
   const { openModal, isModalOpen, closeModal } = useModal();
   const [isExpired, setIsExpired] = useState(false);
-  // console.log("coupon: ", coupon);
+  console.log("coupon: ", coupon);
   const floatDetailModal = () => {
     openModal({
       ...coupon,

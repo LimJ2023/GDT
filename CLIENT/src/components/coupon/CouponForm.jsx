@@ -50,7 +50,7 @@ const CouponForm = ({
     e.preventDefault();
     await onSubmit({ ...couponData, is_used: isUsed });
   };
-
+  console.log("이미지", couponData.image);
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center">
       <div className="pb-6 w-[400px] h-[80vh] overflow-y-auto no-scrollbar bg-stone-50 rounded-xl shadow-md">

@@ -149,6 +149,7 @@ const CouponDetail = () => {
 
   if (!isModalOpen || !selectedCoupon) return null;
 
+  console.log("쿠폰 이미지 : ", couponData.image);
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center ">
       <div className="pb-6 px-2 w-[420px] h-[80vh] overflow-y-auto no-scrollbar bg-stone-50 rounded-xl shadow-md">
@@ -178,15 +179,23 @@ const CouponDetail = () => {
           </div>
 
           {/* 쿠폰이미지 */}
-          <div className={`m-4 p-4 border-white rounded-lg drop-shadow-md bg-white flex justify-center items-center mb-4 ${isUsed ? "grayscale" : ""
-            }`}
-          >
+          <div className={`m-4 p-4 border-white rounded-lg drop-shadow-md bg-white flex justify-center items-center mb-4 ${isUsed ? "grayscale" : ""}`}>
             {couponData.image ? (
-              <img
-                src={`http://18.212.90.82:5000/uploads/coupons/${couponData.image}`}
-                alt="쿠폰 이미지"
-                className="object-contain w-full"
-              />
+              typeof couponData.image === 'string' ? (
+                // URL 형식일 경우
+                <img
+                  src={`http://18.212.90.82:5000/uploads/coupons/${couponData.image}`}
+                  alt="쿠폰 이미지"
+                  className="object-contain w-full"
+                />
+              ) : (
+                // Buffer 형식일 경우
+                <img
+                  src={`data:image/jpeg;base64,${bufferToBase64(couponData.image)}`}
+                  alt="쿠폰 이미지"
+                  className="object-contain w-full"
+                />
+              )
             ) : (
               <div>이미지 없음</div>
             )}
@@ -286,7 +295,7 @@ const CouponDetail = () => {
 
           </div>
           <div className="flex m-4">
-            <button className="flex w-full justify-center border text-sm py-2 rounded-lg hover:font-semibold" onClick={handleDeleteCoupon}>쿠폰삭제하기</button>
+            <button className="flex w-full justify-center border text-sm py-2 rounded-lg hover:font-semibold" onClick={() => handleDeleteCoupon()}>쿠폰삭제하기</button>
           </div>
 
           {/* 저장 + 닫기 */}
