@@ -10,37 +10,45 @@ const {
 } = require("@zxing/library");
 
 async function extractBarcodeAndText(imageBuffer) {
+  console.log("이미지 버퍼 받음 : ", imageBuffer);
+  let barcodeText = null;
   try {
     // 이미지 메타 데이터
     const { width, height } = await sharp(imageBuffer).metadata();
-    // 이미지 전처리
+    
+    // 이미지 전처리 개선
     const preprocessedBuffer = await sharp(imageBuffer)
-      .greyscale() // 회색조 변환 (이미지 흐리게 처리)
-      .resize(1000, null, {
+      .greyscale()
+      .resize(1500, null, { // 크기를 더 크게 조정
         fit: "contain",
         withoutEnlargement: true,
-      }) // 이미지 크기 조정 (선명도 향상)
-      .threshold(128) // 임계값 설정 (이미지 이진화)
-      .raw() // 버퍼 형식으로 변환
+      })
+      .normalize() // 이미지 정규화 추가
+      .sharpen() // 선명도 향상
+      .threshold(128)
+      .raw()
       .toBuffer();
 
-    // 바코드 인식에 사용할 설정을 준비
-    const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, null);
-    const reader = new MultiFormatReader();
-    reader.setHints(hints);
+    // 바코드 인식 시도
+    try {
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, null);
+      hints.set(DecodeHintType.TRY_HARDER, true); // 더 열심히 시도하도록 설정
+      const reader = new MultiFormatReader();
+      reader.setHints(hints);
 
-    // 전처리된 이미지를 바코드 인식을 위한 형식으로 전환환
-    const luminanceSource = new RGBLuminanceSource(
-      preprocessedBuffer,
-      width,
-      height
-    );
-    const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
-
-    // 바코드에서 추출된 번호
-    const barcodeText = reader.decode(binaryBitmap).getText();
-    console.log("바코드 번호:", barcodeText);
+      const luminanceSource = new RGBLuminanceSource(
+        preprocessedBuffer,
+        width,
+        height
+      );
+      const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
+      barcodeText = reader.decode(binaryBitmap).getText();
+      console.log("바코드 번호:", barcodeText);
+    } catch (barcodeError) {
+      console.log("바코드 인식 실패:", barcodeError.message);
+      // 바코드 인식 실패시에도 계속 진행
+    }
 
     const filteredImage = await sharp(imageBuffer) // 이미지 크기 조정 (선명도 향상)
       .resize(1000, null, {
@@ -90,6 +98,7 @@ async function extractBarcodeAndText(imageBuffer) {
     }
   } catch (error) {
     console.error("오류 발생", error.message);
+    throw error; // 오류를 상위로 전파하여 적절한 처리 가능하도록 함
   }
 }
 
@@ -130,9 +139,9 @@ const calculateProductScore = (text) => {
   // 일반적인 상품명 키워드 점수
   const productKeywords = {
     // 가중치 높음. 완전 상품명임
-    high: ["라떼", "아메리카노", "케이크", "주스", "콤보", "콜라", "감자"],
+    high: ["라떼", "아메리카노", "케이크", "주스", "콤보", "콜라", "감자", "우유"],
     // 가중치 중간
-    medium: ["초코", "딸기", "바닐라", "카라멜", "에이드", "스무디"],
+    medium: ["초코", "딸기", "바닐라", "카라멜", "에이드", "스무디", "바나나"],
     // 가중치 낮음
     low: ["핫", "아이스", "콜드", "따뜻한", "차가운", "큰", "작은"],
   };
@@ -196,6 +205,8 @@ const removeAllSpaces = (text) => {
 // 유효기간 추출 함수 수정
 const extractexpirationDate = (text) => {
   const noSpaceText = removeAllSpaces(text);
+  
+  // 기존 형식 체크
   if (noSpaceText.includes("년")) {
     const expiryMatch = noSpaceText.match(
       /유효기간(20\d{2})년(\d{2})월(\d{2})일/
@@ -203,14 +214,24 @@ const extractexpirationDate = (text) => {
     if (expiryMatch) {
       return `${expiryMatch[1]}-${expiryMatch[2]}-${expiryMatch[3]}`;
     }
-  } else {
-    const expiryMatch = noSpaceText.match(
-      /유효기간(20\d{2})\.(\d{2})\.(\d{2})/
-    );
-    if (expiryMatch) {
-      return `${expiryMatch[1]}-${expiryMatch[2]}-${expiryMatch[3]}`;
-    }
+  } 
+  
+  // "유효기간YYYY.MM.DD" 형식 체크
+  const dotMatch = noSpaceText.match(
+    /유효기간(20\d{2})\.(\d{2})\.(\d{2})/
+  );
+  if (dotMatch) {
+    return `${dotMatch[1]}-${dotMatch[2]}-${dotMatch[3]}`;
   }
+  
+  // "유효기간YYYY-MM-DD" 형식 체크
+  const dashMatch = noSpaceText.match(
+    /유효기간(20\d{2})-(\d{2})-(\d{2})/
+  );
+  if (dashMatch) {
+    return `${dashMatch[1]}-${dashMatch[2]}-${dashMatch[3]}`;
+  }
+  
   return null;
 };
 
