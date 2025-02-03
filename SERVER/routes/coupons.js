@@ -51,7 +51,8 @@ module.exports = (db) => {
     router.post('/', upload.single('image'), (req, res) => {
         const { user_id, barcode, name, deadline, usage_location, note, status, newCategories } = req.body;
         // 영구 저장될 이미지 경로 생성
-        const imagePath = req.file ? `/uploads/coupons/${req.file.filename}` : null;
+        // const imagePath = req.file ? `/uploads/coupons/${req.file.filename}` : null;
+        const imagePath = req.file ? `${req.file.filename}` : null;
         
         db.beginTransaction(async (err) => {
             if (err) {

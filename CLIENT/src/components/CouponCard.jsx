@@ -47,6 +47,7 @@ const CouponCard = ({ coupon }) => {
           {coupon.image ?
             <img
               src={`http://18.212.90.82:5000/uploads/coupons/${coupon.image}`} alt={coupon.title} className="object-contain w-[150px] h-auto" /> : <span className="text-gray-500 text-sm">이미지</span>}</div>
+              {/* src={`${import.meta.env.VITE_API_URL}/uploads/coupons/${coupon.image}`} alt={coupon.title} className="object-contain w-[150px] h-auto" /> : <span className="text-gray-500 text-sm">이미지</span>}</div> */}
 
         {/* 텍스트 정보 컬럼 (왼쪽 정렬) */}
         <div className="flex items-top pt-1 justify-start bg-white">
