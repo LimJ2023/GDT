@@ -40,6 +40,9 @@
     
     </aside>
 
+- 기동 화면
+  [메인화면](/notion/메인화면.png)
+  [쿠폰상세](/notion/쿠폰상세.png)
 - 주요기능
     <aside>
     
